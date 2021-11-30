@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '*'
+      - 'Dockerfile'
+      - '.github/workflows/**'
+
+jobs:
+
+  build:
+    name: Build, push, and deploy
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout master
+      uses: actions/checkout@master
+    
+    - name: Build and Update ECS
+      run : | 
+        export AWS_ACCESS_KEY_ID=AKIA5VODWNWY5IUCSR7R
+        export AWS_DEFAULT_REGION=ap-southeast-1
+        export AWS_SECRET_ACCESS_KEY=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
+        aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 939397639601.dkr.ecr.ap-southeast-1.amazonaws.com
+        docker build -t 939397639601.dkr.ecr.ap-southeast-1.amazonaws.com/ivs-be:latest .
+        docker push 939397639601.dkr.ecr.ap-southeast-1.amazonaws.com/ivs-be:latest
+        ./restart.sh 
